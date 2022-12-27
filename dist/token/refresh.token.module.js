@@ -32,9 +32,9 @@ RefreshTokenModule = __decorate([
                 provide: 'RefreshJWTService',
                 useExisting: jwt_1.JwtService
             },
-            refresh_token_redis_service_1.MockRefreshJWTRedisService
+            refresh_token_redis_service_1.RefreshJWTRedisService
         ],
-        exports: ['RefreshJWTService', refresh_token_redis_service_1.MockRefreshJWTRedisService]
+        exports: ['RefreshJWTService', refresh_token_redis_service_1.RefreshJWTRedisService]
     })
 ], RefreshTokenModule);
 exports.RefreshTokenModule = RefreshTokenModule;

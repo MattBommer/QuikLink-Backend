@@ -66,7 +66,6 @@ let AuthService = class AuthService {
     async verifyRefreshToken(refreshToken) {
         try {
             let decoded = this.refreshJWTService.decode(refreshToken);
-            console.log(JSON.stringify(decoded, null, 4));
             let id = this.refreshJWTRedisService.get(decoded.sub);
             await this.refreshJWTService.verifyAsync(refreshToken, { jwtid: id });
             let uuid = crypto.randomUUID();
@@ -85,7 +84,7 @@ AuthService = __decorate([
     __param(2, (0, common_1.Inject)('RefreshJWTService')),
     __param(3, (0, common_1.Inject)('AccessJWTService')),
     __metadata("design:paramtypes", [user_service_1.UserService,
-        refresh_token_redis_service_1.MockRefreshJWTRedisService,
+        refresh_token_redis_service_1.RefreshJWTRedisService,
         jwt_1.JwtService,
         jwt_1.JwtService])
 ], AuthService);

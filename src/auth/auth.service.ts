@@ -80,7 +80,6 @@ export class AuthService {
 
             return tokens
         } catch (err) {
-            console.log(err)
             // Failure to match the JWT signature or cached value results a 401
             throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED)
         }

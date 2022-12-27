@@ -9,8 +9,24 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MockRefreshJWTRedisService = void 0;
+exports.MockRefreshJWTRedisService = exports.RefreshJWTRedisService = void 0;
 const common_1 = require("@nestjs/common");
+let RefreshJWTRedisService = class RefreshJWTRedisService {
+    constructor() {
+        this.database = new Map();
+    }
+    set(key, value) {
+        this.database.set(key, value);
+    }
+    get(key) {
+        return this.database.get(key);
+    }
+};
+RefreshJWTRedisService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [])
+], RefreshJWTRedisService);
+exports.RefreshJWTRedisService = RefreshJWTRedisService;
 let MockRefreshJWTRedisService = class MockRefreshJWTRedisService {
     constructor() {
         this.database = new Map();
