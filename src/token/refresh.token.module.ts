@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MockRefreshJWTRedisService } from './refresh.token.redis.service';
+import { RefreshJWTRedisService } from './refresh.token.redis.service';
 
 @Module({
   imports: [
@@ -22,8 +22,8 @@ import { MockRefreshJWTRedisService } from './refresh.token.redis.service';
       provide: 'RefreshJWTService',
       useExisting: JwtService
     },
-    MockRefreshJWTRedisService
+    RefreshJWTRedisService
 ],
-  exports: ['RefreshJWTService', MockRefreshJWTRedisService]
+  exports: ['RefreshJWTService', RefreshJWTRedisService]
 })
 export class RefreshTokenModule {}

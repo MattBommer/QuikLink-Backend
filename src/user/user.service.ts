@@ -3,35 +3,35 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from "typeorm";
 import { User } from "./user.entity";
 
-// @Injectable()
-// export class UserService {
-//     constructor(
-//         @InjectRepository(User)
-//         private userRepo: Repository<User>,
-//     ) {}
+@Injectable()
+export class UserService {
+    constructor(
+        @InjectRepository(User)
+        private userRepo: Repository<User>,
+    ) {}
 
-//     async create(username: string, password: string): Promise<User> {
-//         let newUser = this.userRepo.create({ username: username, password: password })
-//         return this.userRepo.save(newUser)
-//     }
+    async create(username: string, password: string): Promise<User> {
+        let newUser = this.userRepo.create({ username: username, password: password })
+        return this.userRepo.save(newUser)
+    }
 
-//     async retrieve(username: string): Promise<User | null> {
-//         return this.userRepo.findOneBy({ username: username })
-//     }
+    async retrieve(username: string): Promise<User | null> {
+        return this.userRepo.findOneBy({ username: username })
+    }
 
-//     async update(user: User): Promise<void> {
-//         await this.userRepo.update(user.id, user)
-//     }
+    async update(user: User): Promise<void> {
+        await this.userRepo.update(user.id, user)
+    }
 
-//     async delete(user: User): Promise<boolean> {
-//         let result = await this.userRepo.delete(user)
-//         return new Promise((resolve, _) => resolve(result.affected === 1)) // TODO: Ensure that mssql respects the optional value.
-//     }
-// }
+    async delete(user: User): Promise<boolean> {
+        let result = await this.userRepo.delete(user)
+        return new Promise((resolve, _) => resolve(result.affected === 1)) // TODO: Ensure that mssql respects the optional value.
+    }
+}
 
 // A mocked version of UserService for testing purposes
 @Injectable()
-export class UserService {
+export class MockUserService {
     database: Map<string, User>
 
     constructor() {

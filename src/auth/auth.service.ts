@@ -2,7 +2,7 @@ import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthTokensDto } from './auth.tokens.dto';
-import { MockRefreshJWTRedisService } from 'src/token/refresh.token.redis.service';
+import { RefreshJWTRedisService } from '../token/refresh.token.redis.service';
 
 import * as bcrypt from 'bcrypt'
 import * as crypto from 'crypto'
@@ -11,7 +11,7 @@ import * as crypto from 'crypto'
 export class AuthService {
     constructor(
         private userService: UserService,
-        private refreshJWTRedisService: MockRefreshJWTRedisService,
+        private refreshJWTRedisService: RefreshJWTRedisService,
         @Inject('RefreshJWTService') private refreshJWTService: JwtService,
         @Inject('AccessJWTService') private accessJWTService: JwtService,
     ) {}
