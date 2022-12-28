@@ -74,7 +74,6 @@ let AuthService = class AuthService {
             return tokens;
         }
         catch (err) {
-            console.log(err);
             throw new common_1.HttpException('Unauthorized', common_1.HttpStatus.UNAUTHORIZED);
         }
     }

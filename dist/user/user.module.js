@@ -15,8 +15,19 @@ let UserModule = class UserModule {
 };
 UserModule = __decorate([
     (0, common_1.Module)({
-        providers: [user_service_1.UserService, user_dto_1.UserDto, user_entity_1.User],
-        exports: [user_service_1.UserService, user_dto_1.UserDto, user_entity_1.User]
+        providers: [
+            {
+                provide: user_service_1.UserService,
+                useClass: user_service_1.MockUserService
+            },
+            user_dto_1.UserDto,
+            user_entity_1.User
+        ],
+        exports: [
+            user_service_1.UserService,
+            user_dto_1.UserDto,
+            user_entity_1.User
+        ]
     })
 ], UserModule);
 exports.UserModule = UserModule;
