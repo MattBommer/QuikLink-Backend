@@ -59,9 +59,7 @@ let AuthService = class AuthService {
             let decoded = await this.accessJWTService.verifyAsync(access_token);
             return decoded.sub;
         }
-        catch (_) {
-            throw new common_1.HttpException('Unauthorized', common_1.HttpStatus.UNAUTHORIZED);
-        }
+        catch (_) { }
     }
     async verifyRefreshToken(refreshToken) {
         try {
@@ -73,9 +71,7 @@ let AuthService = class AuthService {
             this.refreshJWTRedisService.set(decoded.sub, uuid);
             return tokens;
         }
-        catch (err) {
-            throw new common_1.HttpException('Unauthorized', common_1.HttpStatus.UNAUTHORIZED);
-        }
+        catch (_) { }
     }
 };
 AuthService = __decorate([

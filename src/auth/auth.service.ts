@@ -49,16 +49,14 @@ export class AuthService {
         }
     }
 
-    async verifyAccessToken(access_token: string): Promise<string> {
+    async verifyAccessToken(access_token: string): Promise<string | undefined> {
         try {
             let decoded = await this.accessJWTService.verifyAsync(access_token)
             return decoded.sub
-        } catch (_) {
-            throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED)
-        }
+        } catch (_) {}
     }
 
-    async verifyRefreshToken(refreshToken: string): Promise<AuthTokensDto> {
+    async verifyRefreshToken(refreshToken: string): Promise<AuthTokensDto | undefined> {
         try {
             // Decode our payload to get username
             let decoded = this.refreshJWTService.decode(refreshToken)
@@ -79,9 +77,6 @@ export class AuthService {
             this.refreshJWTRedisService.set(decoded.sub, uuid)
 
             return tokens
-        } catch (err) {
-            // Failure to match the JWT signature or cached value results a 401
-            throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED)
-        }
+        } catch (_) {}
     }
 }

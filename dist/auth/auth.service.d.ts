@@ -11,6 +11,6 @@ export declare class AuthService {
     login(username: string, password: string): Promise<AuthTokensDto | undefined>;
     signUp(username: string, password: string): Promise<boolean>;
     private _generateTokens;
-    verifyAccessToken(access_token: string): Promise<string>;
-    verifyRefreshToken(refreshToken: string): Promise<AuthTokensDto>;
+    verifyAccessToken(access_token: string): Promise<string | undefined>;
+    verifyRefreshToken(refreshToken: string): Promise<AuthTokensDto | undefined>;
 }

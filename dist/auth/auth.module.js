@@ -12,13 +12,14 @@ const auth_service_1 = require("./auth.service");
 const user_module_1 = require("../user/user.module");
 const access_token_module_1 = require("../token/access.token.module");
 const refresh_token_module_1 = require("../token/refresh.token.module");
+const auth_guard_1 = require("./auth.guard");
 let AuthModule = class AuthModule {
 };
 AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [user_module_1.UserModule, access_token_module_1.AccessTokenModule, refresh_token_module_1.RefreshTokenModule],
-        providers: [auth_service_1.AuthService],
-        exports: [auth_service_1.AuthService]
+        providers: [auth_service_1.AuthService, auth_guard_1.ResourceAuthGuard],
+        exports: [auth_service_1.AuthService, auth_guard_1.ResourceAuthGuard]
     })
 ], AuthModule);
 exports.AuthModule = AuthModule;

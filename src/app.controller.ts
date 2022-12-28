@@ -1,11 +1,10 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Req, Controller, Post, UseGuards, UnauthorizedException } from '@nestjs/common';
+import { ResourceAuthGuard } from './auth/auth.guard';
 import { AuthService } from './auth/auth.service';
-import { AuthTokensDto } from './auth/auth.tokens.dto';
+import { Verify } from './auth/verify.decorator';
 import { UserDto } from './user/user.dto';
+import { AuthResponseStatus, AuthResponseDto } from './auth/auth.response.dto';
 
-class TokenDto {
-  token: string
-}
 
 @Controller()
 export class AppController {
@@ -14,23 +13,49 @@ export class AppController {
     ) {}
 
   @Post('signup')
-  async signUp(@Body() userDto: UserDto): Promise<boolean> {
-    return this.authService.signUp(userDto.username, userDto.password)
+  async signUp(@Body() userDto: UserDto): Promise<AuthResponseDto> {
+    let signUpStatus = await this.authService.signUp(userDto.username, userDto.password) ? AuthResponseStatus.SUCCESS : AuthResponseStatus.FAILURE
+    
+    let message: string
+    switch (signUpStatus) {
+      case AuthResponseStatus.SUCCESS:
+        message = "Check you email for confirmation email."
+        break;
+      case AuthResponseStatus.FAILURE:
+        message = "Email may already be in use. Try sign in or using a different email. "
+        break;
+    }
+
+    return { status: signUpStatus, message: message }
   }
 
   @Post('login')
-  login(@Body() userDto: UserDto): Promise<AuthTokensDto | undefined> {
-    return this.authService.login(userDto.username, userDto.password)
+  async login(@Body() userDto: UserDto): Promise<AuthResponseDto> {
+    let tokens = await this.authService.login(userDto.username, userDto.password)
+
+    let loginStatus = tokens ? AuthResponseStatus.SUCCESS : AuthResponseStatus.FAILURE
+
+    let message: string
+    if (loginStatus === AuthResponseStatus.FAILURE) message = "Incorrect password or email given. Try again"
+
+    return { status: loginStatus, data: tokens, message}
   }
 
-  @Post('verify/access')
-  verifyAccess(@Body() tokenDto: TokenDto): Promise<string> {
-    return this.authService.verifyAccessToken(tokenDto.token)
+  @Post('guard')
+  @UseGuards(ResourceAuthGuard)
+  verifyAccess(@Req() req: Request): Promise<string> {
+    return req['user']
   }
 
-  @Post('verify/refresh')
-  verifyRefresh(@Body() tokenDto: TokenDto): Promise<AuthTokensDto> {
-    return this.authService.verifyRefreshToken(tokenDto.token)
+  @Post('refresh')
+  @Verify('refresh')
+  @UseGuards(ResourceAuthGuard)
+  async verifyRefresh(@Req() req: Request): Promise<AuthResponseDto> {    
+    if (!req['tokens']) {
+      throw new UnauthorizedException()
+    }
+
+    return { status: AuthResponseStatus.SUCCESS, data: req['tokens']}
   }
 
 }

@@ -14,25 +14,44 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppController = void 0;
 const common_1 = require("@nestjs/common");
+const auth_guard_1 = require("./auth/auth.guard");
 const auth_service_1 = require("./auth/auth.service");
+const verify_decorator_1 = require("./auth/verify.decorator");
 const user_dto_1 = require("./user/user.dto");
-class TokenDto {
-}
+const auth_response_dto_1 = require("./auth/auth.response.dto");
 let AppController = class AppController {
     constructor(authService) {
         this.authService = authService;
     }
     async signUp(userDto) {
-        return this.authService.signUp(userDto.username, userDto.password);
+        let signUpStatus = await this.authService.signUp(userDto.username, userDto.password) ? auth_response_dto_1.AuthResponseStatus.SUCCESS : auth_response_dto_1.AuthResponseStatus.FAILURE;
+        let message;
+        switch (signUpStatus) {
+            case auth_response_dto_1.AuthResponseStatus.SUCCESS:
+                message = "Check you email for confirmation email.";
+                break;
+            case auth_response_dto_1.AuthResponseStatus.FAILURE:
+                message = "Email may already be in use. Try sign in or using a different email. ";
+                break;
+        }
+        return { status: signUpStatus, message: message };
     }
-    login(userDto) {
-        return this.authService.login(userDto.username, userDto.password);
+    async login(userDto) {
+        let tokens = await this.authService.login(userDto.username, userDto.password);
+        let loginStatus = tokens ? auth_response_dto_1.AuthResponseStatus.SUCCESS : auth_response_dto_1.AuthResponseStatus.FAILURE;
+        let message;
+        if (loginStatus === auth_response_dto_1.AuthResponseStatus.FAILURE)
+            message = "Incorrect password or email given. Try again";
+        return { status: loginStatus, data: tokens, message };
     }
-    verifyAccess(tokenDto) {
-        return this.authService.verifyAccessToken(tokenDto.token);
+    verifyAccess(req) {
+        return req['user'];
     }
-    verifyRefresh(tokenDto) {
-        return this.authService.verifyRefreshToken(tokenDto.token);
+    async verifyRefresh(req) {
+        if (!req['tokens']) {
+            throw new common_1.UnauthorizedException();
+        }
+        return { status: auth_response_dto_1.AuthResponseStatus.SUCCESS, data: req['tokens'] };
     }
 };
 __decorate([
@@ -50,17 +69,20 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AppController.prototype, "login", null);
 __decorate([
-    (0, common_1.Post)('verify/access'),
-    __param(0, (0, common_1.Body)()),
+    (0, common_1.Post)('guard'),
+    (0, common_1.UseGuards)(auth_guard_1.ResourceAuthGuard),
+    __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [TokenDto]),
+    __metadata("design:paramtypes", [Request]),
     __metadata("design:returntype", Promise)
 ], AppController.prototype, "verifyAccess", null);
 __decorate([
-    (0, common_1.Post)('verify/refresh'),
-    __param(0, (0, common_1.Body)()),
+    (0, common_1.Post)('refresh'),
+    (0, verify_decorator_1.Verify)('refresh'),
+    (0, common_1.UseGuards)(auth_guard_1.ResourceAuthGuard),
+    __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [TokenDto]),
+    __metadata("design:paramtypes", [Request]),
     __metadata("design:returntype", Promise)
 ], AppController.prototype, "verifyRefresh", null);
 AppController = __decorate([

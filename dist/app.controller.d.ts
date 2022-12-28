@@ -1,15 +1,11 @@
 import { AuthService } from './auth/auth.service';
-import { AuthTokensDto } from './auth/auth.tokens.dto';
 import { UserDto } from './user/user.dto';
-declare class TokenDto {
-    token: string;
-}
+import { AuthResponseDto } from './auth/auth.response.dto';
 export declare class AppController {
     private authService;
     constructor(authService: AuthService);
-    signUp(userDto: UserDto): Promise<boolean>;
-    login(userDto: UserDto): Promise<AuthTokensDto | undefined>;
-    verifyAccess(tokenDto: TokenDto): Promise<string>;
-    verifyRefresh(tokenDto: TokenDto): Promise<AuthTokensDto>;
+    signUp(userDto: UserDto): Promise<AuthResponseDto>;
+    login(userDto: UserDto): Promise<AuthResponseDto>;
+    verifyAccess(req: Request): Promise<string>;
+    verifyRefresh(req: Request): Promise<AuthResponseDto>;
 }
-export {};
