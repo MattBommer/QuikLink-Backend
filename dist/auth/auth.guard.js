@@ -20,10 +20,10 @@ let ResourceAuthGuard = class ResourceAuthGuard {
     }
     canActivate(context) {
         var _a, _b;
+        console.log(context.getHandler());
         let tokenVerificationType = (_a = this.reflector.get('verify', context.getHandler())) !== null && _a !== void 0 ? _a : "access";
         let ctx = context.switchToHttp();
         let request = ctx.getRequest();
-        console.log(request.headers);
         let tokenHeader = (_b = request.headers['authorization']) !== null && _b !== void 0 ? _b : "";
         let authHeaderArray = tokenHeader.split(' ');
         let authType = authHeaderArray[0];

@@ -35,9 +35,8 @@ export class ResourceAuthGuard implements CanActivate {
             return (tokens !== undefined)
           })
       }
-
-      
     } 
+    
     return false
   }
 }

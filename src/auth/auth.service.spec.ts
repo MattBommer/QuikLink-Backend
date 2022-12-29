@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpException } from '@nestjs/common'
 import { AuthService } from './auth.service';
 import { MockUserService, UserService } from '../user/user.service';
 import { MockRefreshJWTRedisService, RefreshJWTRedisService } from '../token/refresh.token.redis.service';
@@ -93,18 +92,18 @@ describe('AuthService', () => {
       let tokens = await authService.login("clamp", "agreAtPsswor2d")
       let access_token = tokens.access_token
       let abridged_access_token = access_token.slice(0, access_token.length - 3)
-      await expect(authService.verifyAccessToken(abridged_access_token)).rejects.toThrow()
+      await expect(await authService.verifyAccessToken(abridged_access_token)).toBeUndefined()
     })
 
     it('when access token is expired', async () => {
       let tokens = await authService.login("clamp", "agreAtPsswor2d")
       await new Promise(r => setTimeout(r, 2000)); // sleep 2 secs
-      await expect(authService.verifyAccessToken(tokens.access_token)).rejects.toThrow()
+      expect(await authService.verifyAccessToken(tokens.access_token)).toBeUndefined()
     })
 
     it('when refresh token is given', async () => {
       let tokens = await authService.login("clamp", "agreAtPsswor2d")
-      await expect(authService.verifyAccessToken(tokens.refresh_token)).rejects.toThrow()
+      expect(await authService.verifyAccessToken(tokens.refresh_token)).toBeUndefined()
     })
   })
 
@@ -121,18 +120,18 @@ describe('AuthService', () => {
       let tokens = await authService.login("clamp", "agreAtPsswor2d")
       let refresh_token = tokens.refresh_token
       let abridged_refresh_token = refresh_token.slice(0, refresh_token.length - 3)
-      await expect(authService.verifyAccessToken(abridged_refresh_token)).rejects.toThrow()
+      expect(await authService.verifyAccessToken(abridged_refresh_token)).toBeUndefined()
     })
 
     it('when refresh token is expired', async () => {
       let tokens = await authService.login("clamp", "agreAtPsswor2d")
       await new Promise(r => setTimeout(r, 4000)); // sleep 4 secs
-      await expect(authService.verifyRefreshToken(tokens.refresh_token)).rejects.toThrow()
+      expect(await authService.verifyRefreshToken(tokens.refresh_token)).toBeUndefined()
     })
 
     it('when access token is given', async () => {
       let tokens = await authService.login("clamp", "agreAtPsswor2d")
-      await expect(authService.verifyRefreshToken(tokens.access_token)).rejects.toThrow()
+      expect(await authService.verifyRefreshToken(tokens.access_token)).toBeUndefined()
     })
   })
 });
