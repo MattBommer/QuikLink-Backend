@@ -13,7 +13,7 @@ export class ResourceAuthGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    let tokenVerificationType = this.reflector.get<string>('verify', context.getHandler()) ?? "access"
+    let tokenVerificationType = this.reflector.get<string>('verify', context.getHandler())
     let ctx = context.switchToHttp()
     let request = ctx.getRequest<Request>()
     let tokenHeader = request.headers['authorization'] ?? ""
@@ -21,18 +21,19 @@ export class ResourceAuthGuard implements CanActivate {
     let authType = authHeaderArray[0]
     let token = authHeaderArray[1]
     
-    if (authHeaderArray.length === 2, authType.toLowerCase() === 'bearer') {
+    if (authHeaderArray.length === 2 && authType.toLowerCase() === 'bearer') {
 
       switch (tokenVerificationType) {
-        case 'access':
-          return this.authService.verifyAccessToken(token).then((username) => {
-            request['user'] = username
-            return (username !== undefined)
-          })
         case 'refresh':
           return this.authService.verifyRefreshToken(token).then((tokens) => {
             request['tokens'] = tokens
             return (tokens !== undefined)
+          })
+        case 'access':
+        default:
+          return this.authService.verifyAccessToken(token).then((username) => {
+            request['user'] = username
+            return (username !== undefined)
           })
       }
     } 

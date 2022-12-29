@@ -19,7 +19,19 @@ describe('ResourceAuthGuard', () => {
   });
 
   describe('ResourceAuthGuard', () => {
-    it('when valid access token given', async () => {
+    it('when authorization header is not set', async () => {
+        const mockCtx = createMock<ExecutionContext> ({
+            switchToHttp: () => ({
+                getRequest: () => ({
+                    headers: {}
+                })
+            })
+        })
+
+        expect(await guard.canActivate(mockCtx)).toBe(false)
+    })
+
+    it('when verification method isn\'t set', async () => {
         const mockCtx = createMock<ExecutionContext> ({
             switchToHttp: () => ({
                 getRequest: () => ({
@@ -29,26 +41,44 @@ describe('ResourceAuthGuard', () => {
                 })
             })
         })
-
+        
         expect(await guard.canActivate(mockCtx)).toBe(true)
     })
 
-    it('when invalid access token given', async () => {
-        const mockCtx = createMock<ExecutionContext> ({
+    it('when verification method isn\'t set properly', async () => {
+        let mockCtx = createMock<ExecutionContext> ({
             switchToHttp: () => ({
                 getRequest: () => ({
                     headers: {
-                        'authorization': "bearer access21"
+                        'authorization': "bearer refresh"
                     }
                 })
             })
         })
         
         expect(await guard.canActivate(mockCtx)).toBe(false)
+
+        mockCtx = createMock<ExecutionContext> ({
+            switchToHttp: () => ({
+                getRequest: () => ({
+                    headers: {
+                        'authorization': "bearer access"
+                    }
+                })
+            })
+        })
+
+        let mockReflector = createMock<Reflector> ({
+            get: () => { return 'refresh' } 
+        })
+
+        guard = new ResourceAuthGuard(authService, mockReflector)
+        
+        expect(await guard.canActivate(mockCtx)).toBe(false)
     })
 
-    it('when valid refresh token given', async () => {
-        const mockCtx = createMock<ExecutionContext> ({
+     it('when verification method is set properly', async () => {
+        let mockCtx = createMock<ExecutionContext> ({
             switchToHttp: () => ({
                 getRequest: () => ({
                     headers: {
@@ -58,33 +88,67 @@ describe('ResourceAuthGuard', () => {
             })
         })
 
-        const mockReflector = createMock<Reflector> ({
+        let mockReflector = createMock<Reflector> ({
             get: () => { return 'refresh' } 
         })
 
         guard = new ResourceAuthGuard(authService, mockReflector)
 
         expect(await guard.canActivate(mockCtx)).toBe(true)
-     }) 
 
-     it('when invalid refresh token given', async () => {
-        const mockCtx = createMock<ExecutionContext> ({
+        mockCtx = createMock<ExecutionContext> ({
             switchToHttp: () => ({
                 getRequest: () => ({
                     headers: {
-                        'authorization': "bearer refreshw34r"
+                        'authorization': "bearer access"
                     }
                 })
             })
         })
 
-        const mockReflector = createMock<Reflector> ({
-            get: () => { return 'refresh' } 
+        mockReflector = createMock<Reflector> ({
+            get: () => { return 'access' } 
         })
 
         guard = new ResourceAuthGuard(authService, mockReflector)
 
-        expect(await guard.canActivate(mockCtx)).toBe(false)
+        expect(await guard.canActivate(mockCtx)).toBe(true)
+     })
+
+     it('when authorization header is formated incorrectly', async () => {
+        const mockCtxWrongDelimiter = createMock<ExecutionContext> ({
+            switchToHttp: () => ({
+                getRequest: () => ({
+                    headers: {
+                        'authorization': "bearer-access"
+                    }
+                })
+            })
+        })
+
+        const mockCtxWrongAuthType = createMock<ExecutionContext> ({
+            switchToHttp: () => ({
+                getRequest: () => ({
+                    headers: {
+                        'authorization': "basic access"
+                    }
+                })
+            })
+        })
+
+        const mockCtxInvalidTokenSyntax = createMock<ExecutionContext> ({
+            switchToHttp: () => ({
+                getRequest: () => ({
+                    headers: {
+                        'authorization': "bearer access token"
+                    }
+                })
+            })
+        })
+
+        expect(await guard.canActivate(mockCtxWrongDelimiter)).toBe(false)
+        expect(await guard.canActivate(mockCtxWrongAuthType)).toBe(false)
+        expect(await guard.canActivate(mockCtxInvalidTokenSyntax)).toBe(false)
      })
 }) 
 });
