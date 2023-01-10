@@ -31,9 +31,9 @@ export class ResourceAuthGuard implements CanActivate {
           })
         case 'access':
         default:
-          return this.authService.verifyAccessToken(token).then((username) => {
-            request['user'] = username
-            return (username !== undefined)
+          return this.authService.verifyAccessToken(token).then((userId) => {
+            request['user'] = userId
+            return (userId !== undefined)
           })
       }
     } 

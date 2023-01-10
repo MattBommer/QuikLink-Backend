@@ -1,5 +1,8 @@
 node_modules/
+dist/
 build/
+dump.rdb
 
 **/.DS_Store
 **/*.env
+**/redis.conf

@@ -25,7 +25,7 @@ export class UserService {
 
     async delete(user: User): Promise<boolean> {
         let result = await this.userRepo.delete(user)
-        return new Promise((resolve, _) => resolve(result.affected === 1)) // TODO: Ensure that mssql respects the optional value.
+        return result.affected === 1
     }
 }
 
@@ -43,7 +43,7 @@ export class MockUserService {
     }
 
     async create(username: string, password: string): Promise<User> {
-        this.database.set(username, {id: 0, username: username, password: password})
+        this.database.set(username, {id: 'id', username: username, password: password})
         return this.database[username]
     }
 

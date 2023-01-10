@@ -20,7 +20,7 @@ export class AuthService {
         let user = await this.userService.retrieve(username)
         if (user && await bcrypt.compare(password, user.password)) {
             let uuid = crypto.randomUUID()
-            let tokens = await this._generateTokens(username, uuid)
+            let tokens = await this._generateTokens(user.id, uuid)
             
             this.refreshJWTRedisService.set(username, uuid)
             return tokens
@@ -40,9 +40,9 @@ export class AuthService {
         return userCreated
     }
 
-    private async _generateTokens(username: string, uuid: string) {
-        let access_token = await this.accessJWTService.signAsync({ sub: username, type: 'access' })
-        let refresh_token = await this.refreshJWTService.signAsync({ sub: username, type: 'refresh', jti: uuid })
+    private async _generateTokens(userId: string, refreshTokenId: string) {
+        let access_token = await this.accessJWTService.signAsync({ sub: userId, type: 'access' })
+        let refresh_token = await this.refreshJWTService.signAsync({ sub: userId, type: 'refresh', jti: refreshTokenId })
         return {
             access_token: access_token,
             refresh_token: refresh_token
@@ -62,7 +62,7 @@ export class AuthService {
             let decoded = this.refreshJWTService.decode(refreshToken)
             
             // Look up username in refresh token redis db.
-            let id = this.refreshJWTRedisService.get(decoded.sub)
+            let id = await this.refreshJWTRedisService.get(decoded.sub)
 
             // Match jwt id found in cache with the one given to us.
             await this.refreshJWTService.verifyAsync(refreshToken, { jwtid: id })

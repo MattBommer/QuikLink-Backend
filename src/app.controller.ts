@@ -41,12 +41,6 @@ export class AppController {
     return { status: loginStatus, data: tokens, message}
   }
 
-  @Post('guard')
-  @UseGuards(ResourceAuthGuard)
-  verifyAccess(@Req() req: Request): Promise<string> {
-    return req['user']
-  }
-
   @Post('refresh')
   @Verify('refresh')
   @UseGuards(ResourceAuthGuard)
