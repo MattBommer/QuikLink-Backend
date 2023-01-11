@@ -43,7 +43,7 @@ export class MockUserService {
     }
 
     async create(username: string, password: string): Promise<User> {
-        this.database.set(username, {id: 'id', username: username, password: password})
+        this.database.set(username, {id: username, username: username, password: password})
         return this.database[username]
     }
 
