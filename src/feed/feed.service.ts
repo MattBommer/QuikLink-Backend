@@ -21,8 +21,6 @@ export class FeedService {
         })
     }
 
-    // Verify RSS url and add it if it's real
-    // Return the id for the feed
     async add(userId: string, url: string): Promise<string | undefined> {
         let feed = await this.rssService.validate(url)
         if (feed) {

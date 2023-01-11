@@ -22,7 +22,7 @@ export class AuthService {
             let uuid = crypto.randomUUID()
             let tokens = await this._generateTokens(user.id, uuid)
             
-            this.refreshJWTRedisService.set(username, uuid)
+            this.refreshJWTRedisService.set(user.id, uuid)
             return tokens
         }        
     }
