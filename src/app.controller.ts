@@ -13,20 +13,21 @@ export class AppController {
     ) {}
 
   @Post('signup')
-  async signUp(@Body() userDto: UserDto): Promise<AuthResponseDto> {
+  async signUp(@Body() userDto: UserDto): Promise<AuthResponseDto> { // Ensure this fails when userDto is not set properly
     let signUpStatus = await this.authService.signUp(userDto.username, userDto.password) ? AuthResponseStatus.SUCCESS : AuthResponseStatus.FAILURE
     
     let message: string
+    let data: string
     switch (signUpStatus) {
       case AuthResponseStatus.SUCCESS:
-        message = "Check you email for confirmation email."
+        data = "Check you email for confirmation email."
         break;
       case AuthResponseStatus.FAILURE:
         message = "Email may already be in use. Try sign in or using a different email. "
         break;
     }
 
-    return { status: signUpStatus, message: message }
+    return { status: signUpStatus, data: data, message: message }
   }
 
   @Post('login')
@@ -38,7 +39,7 @@ export class AppController {
     let message: string
     if (loginStatus === AuthResponseStatus.FAILURE) message = "Incorrect password or email given. Try again"
 
-    return { status: loginStatus, data: tokens, message}
+    return { status: loginStatus, data: tokens, message: message}
   }
 
   @Post('refresh')

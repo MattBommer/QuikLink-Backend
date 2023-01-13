@@ -29,6 +29,7 @@ export class AuthService {
 
     async signUp(username: string, password: string): Promise<boolean> {
         let user = await this.userService.retrieve(username)
+
         let userCreated = false
         if (!user) {
             let saltRounds = 10
