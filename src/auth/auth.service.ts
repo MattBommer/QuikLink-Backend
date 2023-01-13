@@ -45,8 +45,8 @@ export class AuthService {
         let access_token = await this.accessJWTService.signAsync({ sub: userId, type: 'access' })
         let refresh_token = await this.refreshJWTService.signAsync({ sub: userId, type: 'refresh', jti: refreshTokenId })
         return {
-            access_token: access_token,
-            refresh_token: refresh_token
+            access: access_token,
+            refresh: refresh_token
         }
     }
 
