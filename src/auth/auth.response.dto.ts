@@ -5,6 +5,6 @@ export class AuthResponseDto {
 }
 
 export enum AuthResponseStatus {
-    SUCCESS = "Success",
-    FAILURE = "Failed"
+    SUCCESS = "success",
+    FAILURE = "failed"
 }

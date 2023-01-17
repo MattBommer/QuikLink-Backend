@@ -1,9 +1,11 @@
-import { Body, Req, Controller, Post, UseGuards, UnauthorizedException } from '@nestjs/common';
+import { Body, Req, Controller, Post, UseGuards, UnauthorizedException, UsePipes, BadRequestException } from '@nestjs/common';
 import { ResourceAuthGuard } from './auth/auth.guard';
 import { AuthService } from './auth/auth.service';
 import { Verify } from './auth/verify.decorator';
-import { UserDto } from './user/user.dto';
+import { CreateUserDto, CreateUserDtoSchema } from './user/user.dto';
 import { AuthResponseStatus, AuthResponseDto } from './auth/auth.response.dto';
+import { SchemaValidationPipe } from './utilities/schema-validation.pipe';
+import { AuthTokensDto } from './auth/auth.tokens.dto';
 
 
 @Controller()
@@ -13,44 +15,34 @@ export class AppController {
     ) {}
 
   @Post('signup')
-  async signUp(@Body() userDto: UserDto): Promise<AuthResponseDto> { // Ensure this fails when userDto is not set properly
-    let signUpStatus = await this.authService.signUp(userDto.username, userDto.password) ? AuthResponseStatus.SUCCESS : AuthResponseStatus.FAILURE
+  @UsePipes(new SchemaValidationPipe(CreateUserDtoSchema))
+  async signUp(@Body() createUserDto: CreateUserDto): Promise<{message: String}> {
+    let signUpSuccessful = await this.authService.signUp(createUserDto.username, createUserDto.password)
     
-    let message: string
-    let data: string
-    switch (signUpStatus) {
-      case AuthResponseStatus.SUCCESS:
-        data = "Check you email for confirmation email."
-        break;
-      case AuthResponseStatus.FAILURE:
-        message = "Email may already be in use. Try sign in or using a different email. "
-        break;
+    if (!signUpSuccessful) {
+      throw new BadRequestException("Email may already be in use. Try sign in or using a different email.")
     }
 
-    return { status: signUpStatus, data: data, message: message }
+    return { message: "Check you email for confirmation email." }
   }
 
   @Post('login')
-  async login(@Body() userDto: UserDto): Promise<AuthResponseDto> {
-    let tokens = await this.authService.login(userDto.username, userDto.password)
+  @UsePipes(new SchemaValidationPipe(CreateUserDtoSchema))
+  async login(@Body() createUserDto: CreateUserDto): Promise<AuthTokensDto> {
+    let tokens = await this.authService.login(createUserDto.username, createUserDto.password)
 
-    let loginStatus = tokens ? AuthResponseStatus.SUCCESS : AuthResponseStatus.FAILURE
+    if (!tokens) {
+      throw new UnauthorizedException("Incorrect password or email given. Try again")
+    }
 
-    let message: string
-    if (loginStatus === AuthResponseStatus.FAILURE) message = "Incorrect password or email given. Try again"
-
-    return { status: loginStatus, data: tokens, message: message}
+    return tokens
   }
 
   @Post('refresh')
   @Verify('refresh')
   @UseGuards(ResourceAuthGuard)
-  async verifyRefresh(@Req() req: Request): Promise<AuthResponseDto> {    
-    if (!req['tokens']) {
-      throw new UnauthorizedException()
-    }
-
-    return { status: AuthResponseStatus.SUCCESS, data: req['tokens']}
+  async verifyRefresh(@Req() req: Request): Promise<AuthTokensDto> {
+    return req['tokens']
   }
 
 }

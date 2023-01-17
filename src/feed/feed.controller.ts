@@ -30,7 +30,6 @@ export class FeedController {
     @Post('update')
     @UseGuards(ResourceAuthGuard)
     async update(@Body() body: Body): Promise<void> {
-        let json = await body.json()
         this.feedService.update(body['feed'])
     }
 }
