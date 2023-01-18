@@ -54,7 +54,9 @@ export class AuthService {
         try {
             let decoded = await this.accessJWTService.verifyAsync(access_token)
             return decoded.sub
-        } catch (_) {}
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     async verifyRefreshToken(refreshToken: string): Promise<AuthTokensDto | undefined> {

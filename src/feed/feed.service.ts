@@ -13,12 +13,12 @@ export class FeedService {
         private rssService: RssService
     ) {}
 
-    async getFeeds(ids: [string]): Promise<RssFeed[]> {
+    async getFeeds(user: string): Promise<RssFeed[]> {
         // get all feeds that a user has subbed too
-        let feedIds = ids.map((feedId) => ({ resourceId: feedId }))
-        return this.feedRepo.find({
-            where: feedIds
-        })
+        return await this.feedRepo.find({
+            //@ts-ignore
+            where: { user: { id : user } }
+           })
     }
 
     async add(userId: string, url: string): Promise<string | undefined> {
@@ -38,12 +38,11 @@ export class FeedService {
         }
     }
 
-    async remove(feed: RssFeed): Promise<boolean> {
-        let results = await this.feedRepo.delete(feed)
+    async remove(user: string, resourceId: string): Promise<boolean> {
+        let results = await this.feedRepo.delete({ 
+            user,
+            resourceId 
+        });
         return results.affected == 1
-    }
-
-    async update(feed: RssFeed) {
-        await this.feedRepo.update(feed.resourceId, feed)
     }
 }
