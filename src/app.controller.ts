@@ -1,9 +1,8 @@
-import { Body, Req, Controller, Post, UseGuards, UnauthorizedException, UsePipes, BadRequestException } from '@nestjs/common';
+import { Body, Req, Controller, Post, Get, UseGuards, UnauthorizedException, UsePipes, BadRequestException } from '@nestjs/common';
 import { ResourceAuthGuard } from './auth/auth.guard';
 import { AuthService } from './auth/auth.service';
 import { Verify } from './auth/verify.decorator';
 import { CreateUserDto, CreateUserDtoSchema } from './user/user.dto';
-import { AuthResponseStatus, AuthResponseDto } from './auth/auth.response.dto';
 import { SchemaValidationPipe } from './utilities/schema-validation.pipe';
 import { AuthTokensDto } from './auth/auth.tokens.dto';
 
@@ -38,7 +37,7 @@ export class AppController {
     return tokens
   }
 
-  @Post('refresh')
+  @Get('refresh')
   @Verify('refresh')
   @UseGuards(ResourceAuthGuard)
   async verifyRefresh(@Req() req: Request): Promise<AuthTokensDto> {

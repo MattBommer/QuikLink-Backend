@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
@@ -10,9 +10,10 @@ export class ResourceAuthGuard implements CanActivate {
     private reflector: Reflector
     ) {}
 
-  canActivate(
+  //@ts-ignore
+  async canActivate(
     context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  ): Promise<boolean | Observable<boolean>> {
     let tokenVerificationType = this.reflector.get<string>('verify', context.getHandler())
     let ctx = context.switchToHttp()
     let request = ctx.getRequest<Request>()
@@ -25,19 +26,27 @@ export class ResourceAuthGuard implements CanActivate {
 
       switch (tokenVerificationType) {
         case 'refresh':
-          return this.authService.verifyRefreshToken(token).then((tokens) => {
-            request['tokens'] = tokens
-            return (tokens !== undefined)
-          })
+          let freshAuthTokens = await this.authService.verifyRefreshToken(token)
+          
+          if (!freshAuthTokens) {
+            throw new UnauthorizedException("Unauthorized: Invalid refresh token")
+          }
+
+          request['tokens'] = token
         case 'access':
         default:
-          return this.authService.verifyAccessToken(token).then((userId) => {
-            request['user'] = userId
-            return (userId !== undefined)
-          })
+          let userId = await this.authService.verifyAccessToken(token)
+          
+          if (!userId) {
+            throw new UnauthorizedException("Unauthorized: Invalid access token")
+          }
+
+          request['user'] = userId
       }
+
+      return true
     } 
     
-    return false
+    throw new UnauthorizedException("Unauthorized: Malformed authorization header")
   }
 }

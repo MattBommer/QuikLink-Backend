@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from "typeorm";
-import { RssFeed } from "./feed.entity";
+import { RssFeed, RssFeedDTO } from "./feed.entity";
 import { RssService } from './rss.service';
-import * as crypto from 'crypto'
 
 @Injectable()
 export class FeedService {
@@ -13,36 +12,44 @@ export class FeedService {
         private rssService: RssService
     ) {}
 
-    async getFeeds(user: string): Promise<RssFeed[]> {
-        // get all feeds that a user has subbed too
-        return await this.feedRepo.find({
+    async getFeeds(user: string): Promise<RssFeedDTO[]> {
+        let feeds = await this.feedRepo.find({
             //@ts-ignore
             where: { user: { id : user } }
            })
+
+        return feeds.map((feed) => this.castFeedToDTO(feed))
     }
 
-    async add(userId: string, url: string): Promise<string | undefined> {
+    async add(userId: string, url: string): Promise<RssFeedDTO | undefined> {
         let feed = await this.rssService.validate(url)
         if (feed) {
-            let uuid = crypto.randomUUID()
-            let feedMetaData = this.feedRepo.create({ 
-                resourceId: uuid, 
+            let feedEntry = this.feedRepo.create({ 
                 title: feed.title,
                 description: feed.description,
                 url: url,
                 imageURL: feed.image?.url,
                 user: userId
             })
-            await this.feedRepo.save(feedMetaData)
-            return uuid
+            await this.feedRepo.save(feedEntry)
+            return this.castFeedToDTO(feedEntry)
         }
     }
 
-    async remove(user: string, resourceId: string): Promise<boolean> {
-        let results = await this.feedRepo.delete({ 
-            user,
-            resourceId 
-        });
-        return results.affected == 1
+    async remove(user: string, resourceId: string): Promise<void> {
+        let feeds = await this.feedRepo.find({
+            //@ts-ignore
+            where: { user: { id: user },
+                     resourceId: resourceId }
+        })
+
+        if (feeds.length === 1) {
+            await this.feedRepo.remove(feeds)
+        }
+    }
+
+    private castFeedToDTO(feed: RssFeed): RssFeedDTO {
+        const { user, ...feedMetaData} = feed
+        return feedMetaData
     }
 }
