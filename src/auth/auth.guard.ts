@@ -24,15 +24,17 @@ export class ResourceAuthGuard implements CanActivate {
     
     if (authHeaderArray.length === 2 && authType.toLowerCase() === 'bearer') {
 
+      console.log(tokenVerificationType)
       switch (tokenVerificationType) {
         case 'refresh':
           let freshAuthTokens = await this.authService.verifyRefreshToken(token)
-          
+
           if (!freshAuthTokens) {
             throw new UnauthorizedException("Unauthorized: Invalid refresh token")
           }
 
-          request['tokens'] = token
+          request['tokens'] = freshAuthTokens
+          break;
         case 'access':
         default:
           let userId = await this.authService.verifyAccessToken(token)
@@ -42,6 +44,7 @@ export class ResourceAuthGuard implements CanActivate {
           }
 
           request['user'] = userId
+          break;
       }
 
       return true

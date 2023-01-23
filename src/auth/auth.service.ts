@@ -55,6 +55,7 @@ export class AuthService {
             let decoded = await this.accessJWTService.verifyAsync(access_token)
             return decoded.sub
         } catch (error) {
+            console.log("Access token")
             console.log(error)
         }
     }
@@ -80,6 +81,9 @@ export class AuthService {
             this.refreshJWTRedisService.set(decoded.sub, uuid)
 
             return tokens
-        } catch (_) {}
+        } catch (error) {
+            console.log("Refresh token")
+            console.log(error)
+        }
     }
 }
