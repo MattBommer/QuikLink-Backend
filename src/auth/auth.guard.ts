@@ -1,30 +1,32 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import { Response } from 'express';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class ResourceAuthGuard implements CanActivate {
   constructor(
     private authService: AuthService,
-    private reflector: Reflector
+    private jwtService: JwtService
     ) {}
 
   //@ts-ignore
   async canActivate(
     context: ExecutionContext,
   ): Promise<boolean | Observable<boolean>> {
-    let tokenVerificationType = this.reflector.get<string>('verify', context.getHandler())
     let ctx = context.switchToHttp()
     let request = ctx.getRequest<Request>()
+    let response = ctx.getResponse<Response>()
     let tokenHeader = request.headers['authorization'] ?? ""
     let authHeaderArray: string[] = tokenHeader.split(' ')
     let authType = authHeaderArray[0]
     let token = authHeaderArray[1]
     
     if (authHeaderArray.length === 2 && authType.toLowerCase() === 'bearer') {
+      let decoded = this.jwtService.decode(token)
+      let tokenVerificationType = decoded['type']
 
-      console.log(tokenVerificationType)
       switch (tokenVerificationType) {
         case 'refresh':
           let freshAuthTokens = await this.authService.verifyRefreshToken(token)
@@ -33,10 +35,12 @@ export class ResourceAuthGuard implements CanActivate {
             throw new UnauthorizedException("Unauthorized: Invalid refresh token")
           }
 
-          request['tokens'] = freshAuthTokens
-          break;
+          //@ts-ignore
+          response.setHeader("access-token", freshAuthTokens.access)
+          //@ts-ignore
+          response.setHeader("refresh-token", freshAuthTokens.refresh)
+          token = freshAuthTokens.access
         case 'access':
-        default:
           let userId = await this.authService.verifyAccessToken(token)
           
           if (!userId) {
@@ -45,6 +49,8 @@ export class ResourceAuthGuard implements CanActivate {
 
           request['user'] = userId
           break;
+        default:
+          throw new UnauthorizedException("Unauthorized: Invalid token payload")
       }
 
       return true

@@ -1,10 +1,8 @@
-import { Body, Req, Controller, Post, Get, UseGuards, UnauthorizedException, UsePipes, BadRequestException } from '@nestjs/common';
-import { ResourceAuthGuard } from './auth/auth.guard';
+import { Body, Controller, Post, UnauthorizedException, UsePipes, BadRequestException, Res } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
-import { Verify } from './auth/verify.decorator';
 import { CreateUserDto, CreateUserDtoSchema } from './user/user.dto';
 import { SchemaValidationPipe } from './utilities/schema-validation.pipe';
-import { AuthTokensDto } from './auth/auth.tokens.dto';
+import { Response } from 'express';
 
 
 @Controller()
@@ -27,21 +25,14 @@ export class AppController {
 
   @Post('login')
   @UsePipes(new SchemaValidationPipe(CreateUserDtoSchema))
-  async login(@Body() createUserDto: CreateUserDto): Promise<AuthTokensDto> {
+  async login(@Body() createUserDto: CreateUserDto, @Res({ passthrough: true }) response: Response): Promise<void> {
     let tokens = await this.authService.login(createUserDto.username, createUserDto.password)
+
+    response.setHeader("access-token", tokens.access)
+    response.setHeader("refresh-token", tokens.refresh)
 
     if (!tokens) {
       throw new UnauthorizedException("Incorrect password or email given. Try again")
     }
-
-    return tokens
   }
-
-  @Get('refresh')
-  @Verify('refresh')
-  @UseGuards(ResourceAuthGuard)
-  async verifyRefresh(@Req() req: Request): Promise<AuthTokensDto> {
-    return req['tokens']
-  }
-
 }
