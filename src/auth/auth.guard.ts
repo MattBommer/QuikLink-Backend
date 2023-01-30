@@ -26,33 +26,29 @@ export class ResourceAuthGuard implements CanActivate {
     if (authHeaderArray.length === 2 && authType.toLowerCase() === 'bearer') {
       let decoded = this.jwtService.decode(token)
       let tokenVerificationType = decoded['type']
+      var userId = decoded['sub']
 
       switch (tokenVerificationType) {
         case 'refresh':
-          let freshAuthTokens = await this.authService.verifyRefreshToken(token)
-
-          if (!freshAuthTokens) {
+          try {
+            let freshAuthTokens = await this.authService.verifyRefreshToken(token)
+            response.setHeader("access-token", freshAuthTokens.access)
+            response.setHeader("refresh-token", freshAuthTokens.refresh)
+          } catch {
             throw new UnauthorizedException("Unauthorized: Invalid refresh token")
           }
-
-          //@ts-ignore
-          response.setHeader("access-token", freshAuthTokens.access)
-          //@ts-ignore
-          response.setHeader("refresh-token", freshAuthTokens.refresh)
-          token = freshAuthTokens.access
+          break;
         case 'access':
-          let userId = await this.authService.verifyAccessToken(token)
-          
-          if (!userId) {
+          try {
+            await this.authService.verifyAccessToken(token)
+          } catch {
             throw new UnauthorizedException("Unauthorized: Invalid access token")
           }
-
-          request['user'] = userId
           break;
         default:
           throw new UnauthorizedException("Unauthorized: Invalid token payload")
       }
-
+      request['user'] = userId
       return true
     } 
     

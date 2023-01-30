@@ -50,40 +50,29 @@ export class AuthService {
         }
     }
 
-    async verifyAccessToken(access_token: string): Promise<string | undefined> {
-        try {
-            let decoded = await this.accessJWTService.verifyAsync(access_token)
-            return decoded.sub
-        } catch (error) {
-            console.log("Access token")
-            console.log(error)
-        }
+    async verifyAccessToken(access_token: string): Promise<void> {
+        await this.accessJWTService.verifyAsync(access_token)
     }
 
-    async verifyRefreshToken(refreshToken: string): Promise<AuthTokensDto | undefined> {
-        try {
-            // Decode our payload to get username
-            let decoded = this.refreshJWTService.decode(refreshToken)
-            
-            // Look up username in refresh token redis db.
-            let id = await this.refreshJWTRedisService.get(decoded.sub)
+    async verifyRefreshToken(refreshToken: string): Promise<AuthTokensDto> {
+        // Decode our payload to get username
+        let decoded = this.refreshJWTService.decode(refreshToken)
+        
+        // Look up username in refresh token redis db.
+        let id = await this.refreshJWTRedisService.get(decoded.sub)
 
-            // Match jwt id found in cache with the one given to us.
-            await this.refreshJWTService.verifyAsync(refreshToken, { jwtid: id })
+        // Match jwt id found in cache with the one given to us.
+        await this.refreshJWTService.verifyAsync(refreshToken, { jwtid: id })
 
-            // Create new UUID for identifying a unique refresh token.
-            let uuid = crypto.randomUUID()
+        // Create new UUID for identifying a unique refresh token.
+        let uuid = crypto.randomUUID()
 
-            // Generate new access and refresh token.
-            let tokens = await this._generateTokens(decoded.sub, uuid)
+        // Generate new access and refresh token.
+        let tokens = await this._generateTokens(decoded.sub, uuid)
 
-            // Update redis db to store the new unique identifier for a users refresh token.
-            this.refreshJWTRedisService.set(decoded.sub, uuid)
+        // Update redis db to store the new unique identifier for a users refresh token.
+        this.refreshJWTRedisService.set(decoded.sub, uuid)
 
-            return tokens
-        } catch (error) {
-            console.log("Refresh token")
-            console.log(error)
-        }
+        return tokens
     }
 }
