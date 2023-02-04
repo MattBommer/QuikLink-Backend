@@ -7,6 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
+    "database": "node database.js",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -43,6 +44,7 @@
     "reflect-metadata": "^0.1.13",
     "rss-parser": "^3.12.0",
     "rxjs": "^7.5.5",
+    "sqlite3": "^5.1.4",
     "typeorm": "^0.3.10"
   },
   "devDependencies": {

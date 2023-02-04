@@ -8,9 +8,9 @@ export class RefreshJWTRedisService {
 
     constructor(private configService: ConfigService) {
         this.redis = new Redis(
-            this.configService.get<number>('REFRESH_JWT_CACHE_PORT'),
-            this.configService.get<string>('REFRESH_JWT_CACHE_HOST'), 
-            { password: this.configService.get<string>('REFRESH_JWT_CACHE_PASSWORD') }
+            this.configService.get<number>('tokenCache.port'),
+            this.configService.get<string>('tokenCache.host'), 
+            this.configService.get<any>('tokenCache.options')
         )
     }
 

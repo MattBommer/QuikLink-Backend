@@ -6,3 +6,4 @@ dump.rdb
 **/.DS_Store
 **/*.env
 **/redis.conf
+**/*.sqlite3
