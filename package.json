@@ -7,9 +7,15 @@
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
+    "database": "node database.js",
+    "env:local": "cp env-examples/env.local-example local.env",
+    "env:prod": "cp env-examples/env.prod-example prod.env",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
+    "start:local": "redis-server & ENV_PATH=local nest start",
+    "start:production": "ENV_PATH=prod nest start",
+    "stop-redis": "lsof -t -i :6379 | xargs kill -9",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -43,6 +49,7 @@
     "reflect-metadata": "^0.1.13",
     "rss-parser": "^3.12.0",
     "rxjs": "^7.5.5",
+    "sqlite3": "^5.1.4",
     "typeorm": "^0.3.10"
   },
   "devDependencies": {

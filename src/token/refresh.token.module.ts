@@ -9,7 +9,7 @@ import { RefreshJWTRedisService } from './refresh.token.redis.service';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('REFRESH_JWT_SECRET'),
+        secret: configService.get<string>('refreshJwtSecret'),
         signOptions: { expiresIn: '7d', issuer: 'skate-bst'},
         verifyOptions: { type: 'refresh', issuer: 'skate-bst' }
       }),
