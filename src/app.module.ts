@@ -7,13 +7,14 @@ import { UserModule } from './user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FeedModule } from './feed/feed.module';
 import { RssFeed } from './feed/feed.entity';
-import { localConfig, prodConfig} from './config/configuration'
+import config from './config/configuration'
 
 //TODO add a way to run things locally or in prod.
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [localConfig]
+      envFilePath: `${process.env.ENV_PATH}.env`,
+      load: [config]
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

@@ -1,23 +1,12 @@
-export const prodConfig = () => ({
+export default () => ({
     database: {
-        type: process.env.DB_TYPE,
+        type: process.env.TYPE,
         host: process.env.HOSTNAME,
         port: parseInt(process.env.DATABASE_PORT),
         username: process.env.USERNAME,
         password: process.env.PASSWORD,
         database: process.env.DATABASE,
     },
-    ...sharedConfig()
-})
-
-export const localConfig = () => ({
-    database: {
-        database: 'quiklink.sqlite3'
-    },
-    ...sharedConfig()
-})
-
-const sharedConfig = () => ({
     tokenCache: {
         port: process.env.CACHE_PORT,
         host: process.env.CACHE_HOST,

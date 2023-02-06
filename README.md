@@ -13,7 +13,7 @@ This project utilizes Redis to cache user auth tokens. You will need to download
 All other project dependencies are in listed in the package.json and can be downloaded with
 
 ```bash
-$ npm install
+$ npm i
 ```
 
 ## Local environment checklist
@@ -33,7 +33,7 @@ npm run database
 This project utilizes .env files to configure our projects environment; allowing our backend to run in a local or production setting. To get started copy the `env.local-example` file into an `.env` file like so:
 
 ```bash
-npm run env
+npm run env:local
 ```
 
 Then open the environment file and fill in the `<...>` with the types specified.
@@ -41,7 +41,7 @@ Then open the environment file and fill in the `<...>` with the types specified.
 ## Running the app
 
 ```bash
-$ npm run start
+$ npm run start:local
 ```
 
 ## Stopping the app

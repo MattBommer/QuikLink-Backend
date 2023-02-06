@@ -28,11 +28,11 @@ export class AppController {
   async login(@Body() createUserDto: CreateUserDto, @Res({ passthrough: true }) response: Response): Promise<void> {
     let tokens = await this.authService.login(createUserDto.username, createUserDto.password)
 
-    response.setHeader("access-token", tokens.access)
-    response.setHeader("refresh-token", tokens.refresh)
-
     if (!tokens) {
       throw new UnauthorizedException("Incorrect password or email given. Try again")
     }
+
+    response.setHeader("access-token", tokens.access)
+    response.setHeader("refresh-token", tokens.refresh)
   }
 }
