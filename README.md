@@ -33,7 +33,7 @@ npm run database
 This project utilizes .env files to configure our projects environment; allowing our backend to run in a local or production setting. To get started copy the `env.local-example` file into an `.env` file like so:
 
 ```bash
-cp env.local-example .env
+npm run env
 ```
 
 Then open the environment file and fill in the `<...>` with the types specified.
@@ -41,11 +41,7 @@ Then open the environment file and fill in the `<...>` with the types specified.
 ## Running the app
 
 ```bash
-# development
 $ npm run start
-
-# production mode
-$ npm run start:prod
 ```
 
 ## Stopping the app

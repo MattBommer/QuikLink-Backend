@@ -8,6 +8,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "database": "node database.js",
+    "env": "cp env-examples/env.local-example .env",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "redis-server & nest start",
