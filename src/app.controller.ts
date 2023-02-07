@@ -20,7 +20,7 @@ export class AppController {
       throw new BadRequestException("Email may already be in use. Try sign in or using a different email.")
     }
 
-    return { message: "Check you email for confirmation email." }
+    return { message: "You have successfully signed up! You may now login to your account." }
   }
 
   @Post('login')
