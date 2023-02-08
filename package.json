@@ -7,9 +7,9 @@
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
-    "database": "node database.js",
-    "env:local": "cp env-examples/env.local-example local.env",
-    "env:prod": "cp env-examples/env.prod-example prod.env",
+    "database": "node scripts/database.js",
+    "make-local-env": "node scripts/local-env.js",
+    "copy-prod-env": "cp env-examples/env.prod-example prod.env",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
