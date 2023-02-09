@@ -4,13 +4,17 @@ Backend for the QuikLink's iOS App
 
 ## Dependancies
 
-This project utilizes Redis to cache user auth tokens. You will need to download the following for the project to run.
+This backend requires that you have Node.js installed on your machine
+
+[Platform specific dowload instructions for Node.js](https://nodejs.org/en/download/)
+
+Additionally, this project utilizes Redis to cache user auth tokens. You will need to download the following for the project to run.
 
 [Platform specific dowload instructions for Redis](https://redis.io/docs/getting-started/)
 
 [Redis dowloads](https://redis.io/download/#redis-downloads)
 
-All other project dependencies are in listed in the package.json and can be downloaded with
+All other project dependencies are listed in the package.json and can be downloaded with
 
 ```bash
 $ npm i
